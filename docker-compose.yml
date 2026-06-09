@@ -1,0 +1,38 @@
+services:
+  mongo:
+    image: mongo:6
+    ports:
+      - "27017:27017"
+    volumes:
+      - birdbot-mongo:/data/db
+
+  birdbot:
+    build: .
+    ports:
+      - "4100:4100"
+    volumes:
+      - birdbot-uploads:/data/birdbot/uploads
+    environment:
+      PORT: 4100
+      MONGO_URL: mongodb://mongo:27017/birdbot
+      UPLOAD_DIR: /data/birdbot/uploads
+      WIDGET_DIR: /app/dist/widget
+      EMBED_DIR: /app/dist/embed
+      DEMO_DIR: /app/demo
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-me}
+      DEMO_JWT: ${DEMO_JWT:-}
+      JWT_USER_ID_CLAIM: ${JWT_USER_ID_CLAIM:-id}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_GROUP_ID: ${TELEGRAM_GROUP_ID:-}
+      TELEGRAM_PROXY_URL: ${TELEGRAM_PROXY_URL:-}
+      TELEGRAM_HTTP_PROXY: ${TELEGRAM_HTTP_PROXY:-}
+      TELEGRAM_HTTP_PROXY_HOST: ${TELEGRAM_HTTP_PROXY_HOST:-}
+      TELEGRAM_HTTP_PROXY_PORT: ${TELEGRAM_HTTP_PROXY_PORT:-}
+      TELEGRAM_HTTP_PROXY_USER: ${TELEGRAM_HTTP_PROXY_USER:-}
+      TELEGRAM_HTTP_PROXY_PASSWORD: ${TELEGRAM_HTTP_PROXY_PASSWORD:-}
+    depends_on:
+      - mongo
+
+volumes:
+  birdbot-mongo:
+  birdbot-uploads:

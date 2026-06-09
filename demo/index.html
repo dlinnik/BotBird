@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BirdBot Demo — Host App</title>
+    <style>
+      :root {
+        --primary: #1890ff;
+        --bg: #f0f2f5;
+        --card: #ffffff;
+        --text: #262626;
+        --muted: #8c8c8c;
+        --border: #f0f0f0;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+          sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+      }
+
+      .layout {
+        display: flex;
+        min-height: 100vh;
+      }
+
+      .sidebar {
+        width: 220px;
+        background: #001529;
+        color: #fff;
+        padding: 24px 16px;
+        flex-shrink: 0;
+      }
+
+      .sidebar h1 {
+        margin: 0 0 8px;
+        font-size: 18px;
+        font-weight: 600;
+      }
+
+      .sidebar p {
+        margin: 0;
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.65);
+      }
+
+      .nav {
+        margin-top: 32px;
+        list-style: none;
+        padding: 0;
+      }
+
+      .nav li {
+        padding: 10px 12px;
+        border-radius: 6px;
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.85);
+        cursor: pointer;
+      }
+
+      .nav li:hover:not(.active) {
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .nav li.active {
+        background: var(--primary);
+        color: #fff;
+      }
+
+      .main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .topbar {
+        height: 56px;
+        background: var(--card);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 24px;
+      }
+
+      .topbar-title {
+        font-size: 16px;
+        font-weight: 500;
+      }
+
+      .topbar-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .content {
+        padding: 24px;
+        flex: 1;
+      }
+
+      .card {
+        background: var(--card);
+        border-radius: 8px;
+        padding: 24px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+        max-width: 720px;
+      }
+
+      .card h2 {
+        margin: 0 0 8px;
+        font-size: 20px;
+      }
+
+      .card p {
+        margin: 0 0 16px;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      .field {
+        margin-bottom: 16px;
+      }
+
+      .field label {
+        display: block;
+        font-size: 13px;
+        color: var(--muted);
+        margin-bottom: 6px;
+      }
+
+      .field input,
+      .field select {
+        width: 100%;
+        max-width: 320px;
+        padding: 8px 12px;
+        border: 1px solid #d9d9d9;
+        border-radius: 6px;
+        font-size: 14px;
+      }
+
+      .status {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        padding: 4px 10px;
+        border-radius: 12px;
+        background: #f6ffed;
+        color: #52c41a;
+        border: 1px solid #b7eb8f;
+      }
+
+      .status.error {
+        background: #fff2f0;
+        color: #ff4d4f;
+        border-color: #ffccc7;
+      }
+
+      .status.loading {
+        background: #e6f7ff;
+        color: var(--primary);
+        border-color: #91d5ff;
+      }
+
+      .status-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: currentColor;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+
+      .btn-primary {
+        background: var(--primary);
+        color: #fff;
+      }
+
+      .btn-primary:hover {
+        background: #40a9ff;
+      }
+
+      .btn-default {
+        background: var(--card);
+        color: var(--text);
+        border: 1px solid #d9d9d9;
+      }
+
+      .btn-default:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+      }
+
+      .hint {
+        margin-top: 24px;
+        padding: 16px;
+        background: #fafafa;
+        border-radius: 6px;
+        font-size: 13px;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      .hint code {
+        background: #f0f0f0;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 12px;
+      }
+
+      .badge-demo {
+        display: inline-block;
+        background: #fff7e6;
+        color: #d46b08;
+        border: 1px solid #ffd591;
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 4px;
+        margin-left: 8px;
+        vertical-align: middle;
+      }
+    </style>
+    <script src="/demo/env.js"></script>
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="sidebar">
+        <h1>Demo Shop</h1>
+        <p>Пример host-приложения</p>
+        <ul class="nav" id="demo-nav">
+          <li class="active" data-path="/demo/">Главная</li>
+          <li data-path="/demo/products">Товары</li>
+          <li data-path="/demo/orders">Заказы</li>
+          <li data-path="/demo/settings">Настройки</li>
+        </ul>
+      </aside>
+
+      <div class="main">
+        <header class="topbar">
+          <span class="topbar-title">Панель управления</span>
+          <div class="topbar-actions">
+            <span id="auth-status" class="status loading">
+              <span class="status-dot"></span>
+              Авторизация...
+            </span>
+            <button id="birdbot-btn" class="btn btn-primary" type="button">
+              💬 Чат с поддержкой
+            </button>
+          </div>
+        </header>
+
+        <main class="content">
+          <div class="card">
+            <h2>
+              BirdBot Demo
+              <span class="badge-demo" id="demo-badge">/demo</span>
+            </h2>
+            <p>
+              Эта страница имитирует host-приложение. Кнопка «Чат с поддержкой» открывает
+              встраиваемый виджет BirdBot через embed SDK. JWT берётся из <code>DEMO_JWT</code> в
+              <code>.env</code> — как в проде, через токен Databird.
+            </p>
+
+            <div class="field">
+              <label for="user-id">ID пользователя (context.userId)</label>
+              <input id="user-id" type="text" value="demo-user-1" />
+            </div>
+
+            <div class="field">
+              <label for="user-name">Имя пользователя (context.name → Telegram)</label>
+              <input id="user-name" type="text" value="Михаил Селиванов" />
+            </div>
+
+            <div class="field">
+              <label for="current-link">Ссылка для следующего сообщения (context.link)</label>
+              <input id="current-link" type="text" />
+            </div>
+
+            <div class="field">
+              <label for="birdbot-url">BirdBot URL (apiUrl) — после смены нажмите «Переподключить»</label>
+              <input id="birdbot-url" type="text" />
+            </div>
+
+            <button id="reinit-btn" class="btn btn-default" type="button">
+              Переподключить виджет
+            </button>
+
+            <div class="hint">
+              <strong>Как это работает:</strong><br />
+              1. Страница загружает <code>/embed/v1.js</code> с BirdBot-сервера<br />
+              2. Токен приходит из <code>/demo/env.js</code> (переменная <code>DEMO_JWT</code>)<br />
+              3. По клику открывает iframe <code>/widget/</code> и передаёт token через postMessage<br />
+              4. При смене страницы в меню вызывается <code>updateContext()</code> — в Telegram уйдёт актуальная <code>link</code><br /><br />
+              <strong>Запуск:</strong> MongoDB + <code>npm run dev</code> → откройте <code>/demo/</code>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        let birdbotInstance = null;
+
+        const userIdInput = document.getElementById('user-id');
+        const userNameInput = document.getElementById('user-name');
+        const currentLinkInput = document.getElementById('current-link');
+        const birdbotUrlInput = document.getElementById('birdbot-url');
+        const authStatus = document.getElementById('auth-status');
+        const reinitBtn = document.getElementById('reinit-btn');
+        const demoBadge = document.getElementById('demo-badge');
+        const demoNav = document.getElementById('demo-nav');
+
+        const demoRoutes = ['/demo/', '/demo/products', '/demo/orders', '/demo/settings'];
+
+        birdbotUrlInput.value = window.location.origin;
+        demoBadge.textContent = window.location.host + '/demo';
+
+        function getMessageLink() {
+          return currentLinkInput.value.trim() || window.location.href;
+        }
+
+        function pushContextToWidget() {
+          if (birdbotInstance && birdbotInstance.updateContext) {
+            birdbotInstance.updateContext();
+          }
+        }
+
+        function refreshLinkField() {
+          currentLinkInput.value = window.location.href;
+        }
+
+        function setActiveNav(path) {
+          demoNav.querySelectorAll('li').forEach(function (item) {
+            item.classList.toggle('active', item.getAttribute('data-path') === path);
+          });
+        }
+
+        function navigateTo(path) {
+          if (window.location.pathname !== path) {
+            window.history.pushState({ demoPath: path }, '', path);
+          }
+          setActiveNav(path);
+          refreshLinkField();
+          pushContextToWidget();
+        }
+
+        demoNav.addEventListener('click', function (event) {
+          var item = event.target.closest('li[data-path]');
+          if (!item) return;
+          navigateTo(item.getAttribute('data-path'));
+        });
+
+        window.addEventListener('popstate', function () {
+          var path = demoRoutes.includes(window.location.pathname)
+            ? window.location.pathname
+            : '/demo/';
+          setActiveNav(path);
+          refreshLinkField();
+          pushContextToWidget();
+        });
+
+        currentLinkInput.addEventListener('change', pushContextToWidget);
+        userIdInput.addEventListener('change', pushContextToWidget);
+        userNameInput.addEventListener('change', pushContextToWidget);
+
+        if (!demoRoutes.includes(window.location.pathname)) {
+          navigateTo('/demo/');
+        } else {
+          setActiveNav(window.location.pathname);
+          refreshLinkField();
+        }
+
+        function setStatus(state, text) {
+          authStatus.className = 'status ' + state;
+          authStatus.innerHTML = '<span class="status-dot"></span>' + text;
+        }
+
+        function getBirdbotBaseUrl() {
+          return birdbotUrlInput.value.replace(/\/$/, '');
+        }
+
+        function getDemoToken() {
+          var token = window.BIRDBOT_DEMO_TOKEN;
+          if (!token) {
+            throw new Error('DEMO_JWT не задан в .env');
+          }
+          return token;
+        }
+
+        function loadScript(src) {
+          return new Promise(function (resolve, reject) {
+            var existing = document.querySelector('script[data-birdbot-sdk]');
+            if (existing) {
+              existing.remove();
+            }
+            var script = document.createElement('script');
+            script.src = src;
+            script.dataset.birdbotSdk = '1';
+            script.onload = resolve;
+            script.onerror = function () {
+              reject(new Error('Не удалось загрузить SDK: ' + src));
+            };
+            document.body.appendChild(script);
+          });
+        }
+
+        async function initBirdBot() {
+          if (birdbotInstance) {
+            birdbotInstance.destroy();
+            birdbotInstance = null;
+          }
+
+          setStatus('loading', 'Подключение...');
+
+          try {
+            var token = getDemoToken();
+            var base = getBirdbotBaseUrl();
+            await loadScript(base + '/embed/v1.js');
+
+            if (!window.BirdBot) {
+              throw new Error('BirdBot SDK не найден');
+            }
+
+            birdbotInstance = window.BirdBot.init({
+              apiUrl: base,
+              button: '#birdbot-btn',
+              getToken: function () {
+                return token;
+              },
+              getContext: function () {
+                return {
+                  link: getMessageLink(),
+                  host: 'demo-shop',
+                  userId: userIdInput.value.trim() || 'demo-user-1',
+                  name: userNameInput.value.trim() || 'Михаил Селиванов',
+                };
+              },
+            });
+
+            setStatus('', 'Виджет подключён · ' + (userIdInput.value.trim() || 'demo-user-1'));
+          } catch (err) {
+            setStatus('error', err.message || 'Ошибка подключения');
+            console.error('[BirdBot Demo]', err);
+          }
+        }
+
+        reinitBtn.addEventListener('click', function () {
+          initBirdBot();
+        });
+
+        initBirdBot();
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "ES2018",
+    "module": "ES2020",
+    "moduleResolution": "node",
+    "outDir": "dist/embed-build",
+    "rootDir": "src/embed",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "declaration": false,
+    "skipLibCheck": true
+  },
+  "include": ["src/embed/**/*"]
+}
