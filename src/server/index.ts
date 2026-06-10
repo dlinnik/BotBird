@@ -45,9 +45,10 @@ async function bootstrap(): Promise<void> {
     startTelegramWorker();
   }
 
-  app.listen(config.port, () => {
-    const base = `http://localhost:${config.port}`;
-    console.log(`[BirdBot] Listening on ${base}`);
+  const host = process.env.HOST ?? '127.0.0.1';
+  app.listen(config.port, host, () => {
+    const base = `http://${host === '0.0.0.0' ? 'localhost' : host}:${config.port}`;
+    console.log(`[BirdBot] Listening on ${host}:${config.port}`);
     console.log(`  API:    ${base}/api/v1/health`);
     console.log(`  Widget: ${base}/widget/`);
     console.log(`  Embed:  ${base}/embed/v1.js`);

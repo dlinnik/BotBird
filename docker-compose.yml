@@ -1,14 +1,12 @@
 services:
   birdbot:
     build: .
-    ports:
-      - "4100:4100"
+    network_mode: host
     volumes:
       - birdbot-uploads:/data/birdbot/uploads
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     environment:
-      PORT: 4100
+      PORT: ${PORT:-4100}
+      HOST: ${HOST:-127.0.0.1}
       MONGO_URL: ${MONGO_URL:?Set MONGO_URL in .env}
       UPLOAD_DIR: /data/birdbot/uploads
       WIDGET_DIR: /app/dist/widget
