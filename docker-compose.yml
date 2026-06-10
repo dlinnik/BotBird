@@ -1,20 +1,15 @@
 services:
-  mongo:
-    image: mongo:6
-    ports:
-      - "27017:27017"
-    volumes:
-      - birdbot-mongo:/data/db
-
   birdbot:
     build: .
     ports:
       - "4100:4100"
     volumes:
       - birdbot-uploads:/data/birdbot/uploads
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
       PORT: 4100
-      MONGO_URL: mongodb://mongo:27017/birdbot
+      MONGO_URL: ${MONGO_URL:?Set MONGO_URL in .env}
       UPLOAD_DIR: /data/birdbot/uploads
       WIDGET_DIR: /app/dist/widget
       EMBED_DIR: /app/dist/embed
@@ -30,9 +25,6 @@ services:
       TELEGRAM_HTTP_PROXY_PORT: ${TELEGRAM_HTTP_PROXY_PORT:-}
       TELEGRAM_HTTP_PROXY_USER: ${TELEGRAM_HTTP_PROXY_USER:-}
       TELEGRAM_HTTP_PROXY_PASSWORD: ${TELEGRAM_HTTP_PROXY_PASSWORD:-}
-    depends_on:
-      - mongo
 
 volumes:
-  birdbot-mongo:
   birdbot-uploads:
