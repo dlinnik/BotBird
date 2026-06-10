@@ -45,11 +45,12 @@ export function isTelegramInlineLinkUrl(url: string): boolean {
     if (hostname === '127.0.0.1' || hostname === '::1' || hostname === '[::1]') return false;
 
     if (/^\d+\.\d+\.\d+\.\d+$/.test(hostname)) {
-      const parts = hostname.split('.').map(Number);
-      if (parts[0] === 10) return false;
-      if (parts[0] === 192 && parts[1] === 168) return false;
-      if (parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31) return false;
-      if (parts[0] === 127) return false;
+      const [octet0, octet1] = hostname.split('.').map(Number);
+      if (octet0 === undefined || octet1 === undefined) return false;
+      if (octet0 === 10) return false;
+      if (octet0 === 192 && octet1 === 168) return false;
+      if (octet0 === 172 && octet1 >= 16 && octet1 <= 31) return false;
+      if (octet0 === 127) return false;
     }
 
     return true;
